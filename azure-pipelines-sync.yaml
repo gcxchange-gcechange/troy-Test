@@ -1,0 +1,20 @@
+trigger:
+  branches:
+    include:
+    - '*'
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- script: |
+    echo Sync azure repo
+    git clone --bare https://dev.azure.com/tbs-sct/GCExchange/_git/troy-Test.git
+    cd brigade-script-testing.git
+    git remote add --mirror=fetch upstream https://github.com/gcxchange-gcechange/troy-Test.git
+    git fetch upstream --tags
+    B64_PAT=$(echo -n ":$PAT" | base64)
+    git -c http.extraHeader="Authorization: Basic ${B64_PAT}" push origin --all
+  env:
+    PAT: $(PAT)
+  displayName: 'Sync repo'
